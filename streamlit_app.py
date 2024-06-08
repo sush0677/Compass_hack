@@ -104,8 +104,8 @@ generate_captions = st.checkbox("Generate Captions")
 
 if st.button("Generate Video"):
     if uploaded_video and uploaded_audio:
-        video_path = uploaded_video.name
-        audio_path = uploaded_audio.name
+        video_path = f"uploaded_{uploaded_video.name}"
+        audio_path = f"uploaded_{uploaded_audio.name}"
 
         # Save uploaded files
         with open(video_path, "wb") as f:
