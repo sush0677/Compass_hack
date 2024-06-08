@@ -2,3 +2,5 @@ streamlit
 numpy
 opencv-python
 scikit-learn
+whisper
+transformers
