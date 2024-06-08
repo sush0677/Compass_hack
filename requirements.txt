@@ -3,4 +3,4 @@ moviepy
 gtts
 spacy
 transformers
-cv2
+opencv-python
