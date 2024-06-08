@@ -1,64 +1,61 @@
 import streamlit as st
-import numpy as np
-from sklearn.decomposition import PCA
-import cv2
+import whisper
+from transformers import pipeline
 
-# Function to read video and extract frames
-def extract_frames(video_path):
-    try:
-        cap = cv2.VideoCapture(video_path)
-        frames = []
-        while True:
-            ret, frame = cap.read()
-            if not ret:
-                break
-            frames.append(frame)
-        cap.release()
-        return frames
-    except Exception as e:
-        st.error(f"Error in extracting frames: {e}")
+# Function to extract video description
+def extract_video_description(video_path):
+    # Load the pre-trained Whisper model
+    model = whisper.load_model("base")
+    
+    # Transcribe the video
+    result = model.transcribe(video_path)
+    transcript = result['text']
+    
+    return transcript
 
-# Function to optimize features using PCA
-def optimize_features(frames, n_components=50):
-    try:
-        flattened_frames = [frame.flatten() for frame in frames]
-        pca = PCA(n_components=n_components)
-        pca_frames = pca.fit_transform(flattened_frames)
-        return pca, pca_frames
-    except Exception as e:
-        st.error(f"Error in optimizing features: {e}")
+# Function to translate text
+def translate_text(text, target_language):
+    # Load the translation pipeline with a specific model
+    if target_language == "arabic":
+        translator = pipeline("translation", model="Helsinki-NLP/opus-mt-en-ar")
+    else:
+        raise ValueError("Target language not supported.")
+    
+    # Split text into chunks to avoid exceeding model limits
+    max_length = 512  # Model-specific token limit
+    text_chunks = [text[i:i+max_length] for i in range(0, len(text), max_length)]
+    
+    # Translate each chunk
+    translated_text = ""
+    for chunk in text_chunks:
+        translation = translator(chunk)
+        translated_text += translation[0]['translation_text'] + " "
+    
+    return translated_text.strip()
 
 # Streamlit app
-st.title('Video Feature Optimization Tool')
+def main():
+    st.title("Video Transcription and Translation App")
 
-# File uploader
-video_file = st.file_uploader("Upload a video", type=["mp4", "avi", "mov"])
+    # Upload video file
+    uploaded_file = st.file_uploader("Upload a video file", type=["mp4", "mkv", "avi", "mov"])
 
-if video_file is not None:
-    try:
-        video_path = 'temp_video.mp4'
-        with open(video_path, 'wb') as f:
-            f.write(video_file.getbuffer())
+    if uploaded_file is not None:
+        with open("temp_video.mp4", "wb") as f:
+            f.write(uploaded_file.read())
 
-        # Extract frames
-        frames = extract_frames(video_path)
-        st.write(f"Total frames extracted: {len(frames)}")
+        st.write("Extracting transcript...")
+        transcript = extract_video_description("temp_video.mp4")
+        st.write("Transcript:")
+        st.write(transcript)
 
-        # Display a few frames
-        st.write("Sample Frames:")
-        for i in range(0, len(frames), max(1, len(frames)//10)):
-            st.image(cv2.cvtColor(frames[i], cv2.COLOR_BGR2RGB), caption=f"Frame {i}")
+        target_language = st.selectbox("Select target language for translation", ["arabic"])
 
-        # Optimize features
-        st.write("Optimizing features...")
-        pca, pca_frames = optimize_features(frames)
-        st.write(f"Features reduced to {pca.n_components_} components.")
+        if st.button("Translate Transcript"):
+            st.write("Translating transcript...")
+            translated_text = translate_text(transcript, target_language)
+            st.write("Translated Text:")
+            st.write(translated_text)
 
-        # Display PCA components
-        st.write("PCA Components (Sample):")
-        st.write(pca_frames[:10])
-
-    except Exception as e:
-        st.error(f"An error occurred: {e}")
-
-st.write("Developed by [Your Name]")
+if __name__ == "__main__":
+    main()
