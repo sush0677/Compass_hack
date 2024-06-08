@@ -5,7 +5,7 @@ spacy
 transformers
 opencv-python
 opencv-python-headless
-torch 
+torchvision
 librosa
 pandas
 nltk
