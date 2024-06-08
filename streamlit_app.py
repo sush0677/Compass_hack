@@ -1,46 +1,29 @@
 import streamlit as st
-from moviepy.editor import TextClip, CompositeVideoClip, AudioFileClip, VideoFileClip
-from transformers import pipeline
-from moviepy.video.fx.all import resize
-import cv2
-import numpy as np
+from moviepy.editor import TextClip, CompositeVideoClip, AudioFileClip
+from gtts import gTTS
+import random
 
 st.set_page_config(page_title="AI Content Creation Studio", layout="wide")
 
-def generate_video(text, duration=10):
-    # Create a video with dynamic background and text overlay
-    width, height = 640, 480
-    background = np.random.randint(0, 255, (height, width, 3), dtype=np.uint8)
-    video_file = "background.mp4"
-    out = cv2.VideoWriter(video_file, cv2.VideoWriter_fourcc(*'mp4v'), 24, (width, height))
-
-    for _ in range(duration * 24):
-        out.write(background)
-    out.release()
-
-    # Add text overlay
-    clip = VideoFileClip(video_file)
-    txt_clip = (TextClip(text, fontsize=70, color='white', size=(width, height), method='caption')
-                .set_duration(duration)
-                .set_position('center'))
-
-    video = CompositeVideoClip([clip, txt_clip])
-    final_video_file = "output_video.mp4"
-    video.write_videofile(final_video_file, fps=24)
-    return final_video_file
+def generate_video(text):
+    # Generate a simple video with text overlay
+    clip = TextClip(text, fontsize=70, color='white', size=(640, 480))
+    clip = clip.set_duration(10)  # 10 seconds duration
+    video = CompositeVideoClip([clip])
+    video_file = "output.mp4"
+    video.write_videofile(video_file, fps=24)
+    return video_file
 
 def generate_audio(text):
-    # Use Hugging Face's TTS model
-    tts_pipeline = pipeline("text-to-speech", model="tts_model")
-    audio = tts_pipeline(text)[0]["generated_audio"]
+    # Generate audio using gTTS
+    tts = gTTS(text)
     audio_file = "audio.mp3"
-    with open(audio_file, "wb") as f:
-        f.write(audio)
+    tts.save(audio_file)
     return audio_file
 
 def add_audio_to_video(video_file, audio_file):
     # Combine video and audio
-    video = VideoFileClip(video_file)
+    video = CompositeVideoClip([video_file])
     audio = AudioFileClip(audio_file)
     final_video = video.set_audio(audio)
     final_video_file = "final_output.mp4"
@@ -48,7 +31,7 @@ def add_audio_to_video(video_file, audio_file):
     return final_video_file
 
 def generate_captions(text):
-    # Generate captions using AI-based summarization or other NLP techniques
+    # Generate simple captions
     captions = f"Captions: {text}"
     return captions
 
@@ -56,7 +39,7 @@ st.title("AI Content Creation Studio for myco.io")
 st.sidebar.header("Settings")
 st.sidebar.write("Configure your video generation settings")
 
-user_input = st.sidebar.text_area("Enter text to generate video with audio and captions")
+user_input = st.sidebar.text_input("Enter text to generate video with audio and captions")
 if st.sidebar.button("Generate"):
     if user_input:
         with st.spinner("Generating video..."):
