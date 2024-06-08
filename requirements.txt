@@ -4,3 +4,4 @@ gtts
 spacy
 transformers
 opencv-python
+opencv-python-headless
