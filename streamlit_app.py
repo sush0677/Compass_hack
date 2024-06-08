@@ -53,59 +53,57 @@ def translate_text(text, target_language):
     return translated_text.strip()
 
 # Streamlit app
-def main():
-    st.title("Video Transcription and Translation App")
+st.title("Video Transcription and Translation App")
 
-    video_file = st.file_uploader("Upload a video file", type=["mp4", "mov", "avi", "mkv"])
+video_file = st.file_uploader("Upload a video file", type=["mp4", "mov", "avi", "mkv"])
 
-    if video_file is not None:
-        video_path = f"/tmp/{video_file.name}"
-        with open(video_path, "wb") as f:
-            f.write(video_file.getbuffer())
-        
-        st.video(video_file)
+if video_file is not None:
+    video_path = f"/tmp/{video_file.name}"
+    with open(video_path, "wb") as f:
+        f.write(video_file.getbuffer())
+    
+    st.video(video_file)
 
-        # Extract audio
-        audio_path = "/tmp/extracted_audio.wav"
-        extract_audio_from_video(video_path, audio_path)
-        st.success("Audio extracted successfully!")
+    # Extract audio
+    audio_path = "/tmp/extracted_audio.wav"
+    extract_audio_from_video(video_path, audio_path)
+    st.success("Audio extracted successfully!")
 
-        # Enhance audio
-        enhanced_audio_path = "/tmp/enhanced_audio.wav"
-        enhance_audio(audio_path, enhanced_audio_path)
-        st.success("Audio enhanced successfully!")
+    # Enhance audio
+    enhanced_audio_path = "/tmp/enhanced_audio.wav"
+    enhance_audio(audio_path, enhanced_audio_path)
+    st.success("Audio enhanced successfully!")
 
-        # Transcribe video
-        segments = extract_video_description_with_timestamps(enhanced_audio_path)
-        captions = format_captions(segments)
+    # Transcribe video
+    segments = extract_video_description_with_timestamps(enhanced_audio_path)
+    captions = format_captions(segments)
 
-        # Display transcript
-        transcript = " ".join([caption['text'] for caption in captions])
-        st.subheader("Video Transcript")
-        st.write(transcript)
+    # Display transcript
+    transcript = " ".join([caption['text'] for caption in captions])
+    st.subheader("Video Transcript")
+    st.write(transcript)
 
-        # Translate transcript
-        target_language = st.selectbox("Select target language", ["arabic"])
-        if st.button("Translate"):
-            translated_text = translate_text(transcript, target_language)
-            st.subheader("Translated Text")
-            st.write(translated_text)
+    # Translate transcript
+    target_language = st.selectbox("Select target language", ["arabic"])
+    if st.button("Translate"):
+        translated_text = translate_text(transcript, target_language)
+        st.subheader("Translated Text")
+        st.write(translated_text)
 
-        # Save captions to SRT
-        srt_path = "/tmp/captions.srt"
-        with open(srt_path, 'w') as f:
-            for i, caption in enumerate(captions, start=1):
-                start = caption['start']
-                end = caption['end']
-                text = caption['text']
-                start_h, start_m, start_s = int(start // 3600), int((start % 3600) // 60), start % 60
-                end_h, end_m, end_s = int(end // 3600), int((end % 3600) // 60), end % 60
-                f.write(f"{i}\n")
-                f.write(f"{start_h:02}:{start_m:02}:{start_s:06.3f} --> {end_h:02}:{end_m:02}:{end_s:06.3f}\n")
-                f.write(f"{text}\n\n")
-        
-        with open(srt_path, "rb") as file:
-            st.download_button("Download Captions (SRT)", file, file_name="captions.srt")
+    # Save captions to SRT
+    srt_path = "/tmp/captions.srt"
+    with open(srt_path, 'w') as f:
+        for i, caption in enumerate(captions, start=1):
+            start = caption['start']
+            end = caption['end']
+            text = caption['text']
+            start_h, start_m, start_s = int(start // 3600), int((start % 3600) // 60), start % 60
+            end_h, end_m, end_s = int(end // 3600), int((end % 3600) // 60), end % 60
+            f.write(f"{i}\n")
+            f.write(f"{start_h:02}:{start_m:02}:{start_s:06.3f} --> {end_h:02}:{end_m:02}:{end_s:06.3f}\n")
+            f.write(f"{text}\n\n")
+    
+    with open(srt_path, "rb") as file:
+        st.download_button("Download Captions (SRT)", file, file_name="captions.srt")
 
-if __name__ == "__main__":
-    main()
+st.caption("Developed by Elite")
