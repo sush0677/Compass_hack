@@ -1,3 +1,7 @@
 streamlit
+<<<<<<< HEAD
 whisper
+=======
+openai-whisper
+>>>>>>> 1174ce249239fcfe4d06442bf5a3ab58afccebd7
 transformers
