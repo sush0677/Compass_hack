@@ -1,7 +1,7 @@
 import streamlit as st
-import cv2
 import numpy as np
 from sklearn.decomposition import PCA
+import cv2
 
 # Function to read video and extract frames
 def extract_frames(video_path):
