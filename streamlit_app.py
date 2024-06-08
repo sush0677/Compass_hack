@@ -7,7 +7,6 @@ st.set_page_config(page_title="AI Content Creation Studio", layout="wide")
 
 def generate_video(text):
     # Generate a simple video with text overlay
-    clip = TextClip(text, fontsize=70, color='white', size=(640, 480))
     clip = clip.set_duration(10)  # 10 seconds duration
     video = CompositeVideoClip([clip])
     video_file = "output.mp4"
