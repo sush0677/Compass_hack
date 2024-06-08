@@ -3,3 +3,4 @@ openai-whisper
 transformers
 pydub
 moviepy
+ffmpeg
