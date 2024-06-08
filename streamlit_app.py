@@ -4,6 +4,15 @@ from transformers import pipeline
 from moviepy.video.fx.all import resize
 import cv2
 import numpy as np
+import spacy
+
+# Download the spaCy model
+try:
+    nlp = spacy.load("en_core_web_sm")
+except IOError:
+    import subprocess
+    subprocess.run(["python", "-m", "spacy", "download", "en_core_web_sm"])
+    nlp = spacy.load("en_core_web_sm")
 
 st.set_page_config(page_title="AI Content Creation Studio", layout="wide")
 
