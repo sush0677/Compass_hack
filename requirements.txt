@@ -1,3 +1,4 @@
 streamlit
-whisper
+openai
+openai-whisper
 transformers
