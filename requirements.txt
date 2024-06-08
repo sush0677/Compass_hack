@@ -1,6 +1,6 @@
+python-3.11.0
 streamlit
 openai-whisper==20231117
-python-3.11.0
 transformers
 pydub
 moviepy
