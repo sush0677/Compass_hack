@@ -3,3 +3,4 @@ moviepy
 gtts
 spacy
 transformers
+cv2
