@@ -1,14 +1,3 @@
 streamlit
-moviepy
-gtts
-spacy
+whisper
 transformers
-opencv-python
-opencv-python-headless
-torchvision
-librosa
-pandas
-nltk
-numpy
-torchaudio
-tqdm
