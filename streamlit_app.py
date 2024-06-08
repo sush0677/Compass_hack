@@ -1,9 +1,28 @@
 import streamlit as st
 from moviepy.editor import TextClip, CompositeVideoClip, AudioFileClip, VideoFileClip
 from transformers import pipeline
-from moviepy.video.fx.all import resize
-import cv2
 import numpy as np
+import subprocess
+
+# Ensure that cv2 is installed
+try:
+    import cv2
+except ImportError:
+    subprocess.run(['pip', 'install', 'opencv-python'])
+    import cv2
+
+# Ensure that spacy and the required model are installed
+try:
+    import spacy
+    nlp = spacy.load("en_core_web_sm")
+except ImportError:
+    subprocess.run(['pip', 'install', 'spacy'])
+    import spacy
+    try:
+        nlp = spacy.load("en_core_web_sm")
+    except IOError:
+        subprocess.run(["python", "-m", "spacy", "download", "en_core_web_sm"])
+        nlp = spacy.load("en_core_web_sm")
 
 st.set_page_config(page_title="AI Content Creation Studio", layout="wide")
 
@@ -27,6 +46,10 @@ def generate_video(text, duration=10):
     video = CompositeVideoClip([clip, txt_clip])
     final_video_file = "output_video.mp4"
     video.write_videofile(final_video_file, fps=24)
+    
+    # Clean up temporary video file
+    clip.reader.close()
+    clip.audio.reader.close_proc()
     return final_video_file
 
 def generate_audio(text):
