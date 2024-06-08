@@ -1,3 +1,5 @@
 streamlit
-whisper
+openai-whisper
 transformers
+pydub
+moviepy
